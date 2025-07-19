@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, Droplet, Facebook, Feather, Instagram, Leaf, Sta
 import useEmblaCarousel from 'embla-carousel-react';
 import { useNavigate } from "react-router";
 import cravingImage from "../../assets/images/craving.jpg"; // Adjust the path as necessary
-import hunt from "../../assets/images/hunt.jpg";
 import photo1 from "../../assets/images/photo-1484821582734-6c6c9f99a672.jpg";
 import photo2 from "../../assets/images/photo-1517248135467-4c7edcad34c4.jpg";
 import photo3 from "../../assets/images/photo-1595295333158-4742f28fbd85.jpg";
