@@ -1,12 +1,19 @@
-import { cloneElement, useEffect, useState, type ReactElement } from "react";
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import AnimatedSection from "../../components/AnimatedSection";
 import { ArrowLeft, ArrowRight, Droplet, Facebook, Feather, Instagram, Leaf, Star, Twitter } from "lucide-react";
+import useEmblaCarousel from 'embla-carousel-react';
 import { useNavigate } from "react-router";
 import cravingImage from "../../assets/images/craving.jpg"; // Adjust the path as necessary
+import hunt from "../../assets/images/hunt.jpg";
+import photo1 from "../../assets/images/photo-1484821582734-6c6c9f99a672.jpg";
+import photo2 from "../../assets/images/photo-1517248135467-4c7edcad34c4.jpg";
+import photo3 from "../../assets/images/photo-1595295333158-4742f28fbd85.jpg";
+import photo4 from "../../assets/images/photo-1600585152220-90363fe7e115.jpg";
+import photo5 from "../../assets/images/photo-1601050690597-df0568f70950.jpg";
 
 interface ExperienceItem {
-    icon: ReactElement;
+    icon: React.ComponentType<{ size?: number }>;
     title: string;
     desc: string;
 }
@@ -15,59 +22,110 @@ interface MenuHighlight {
     description: string;
     image: string;
 }
-const comingSoonImageUrl = 'https://images.unsplash.com/photo-1606791422814-b32c70526e27?q=80&w=1974&auto=format&fit=crop';
+const comingSoonImageUrl = "";
 const menuHighlights: MenuHighlight[] = [
-    { name: "Shorshe Ilish", description: "Hilsa fish steamed in a pungent mustard-poppy seed gravy.", image: "https://images.unsplash.com/photo-1625944015196-2a85e156f1f4?q=80&w=2070&auto=format&fit=crop" },
-    { name: "Kolkata Biryani", description: "Aromatic long-grain rice, tender meat, and a signature potato.", image: "https://images.unsplash.com/photo-1633933358117-a27b954754d0?q=80&w=1974&auto=format&fit=crop" },
-    { name: "Daab Chingri", description: "Prawns in a creamy coconut curry, served inside a green coconut.", image: "https://images.unsplash.com/photo-1567188042027-28d4039311a3?q=80&w=1935&auto=format&fit=crop" },
-    { name: "Mishti Doi", description: "Sweet, caramelized yogurt, set in traditional earthenware pots.", image: "https://images.unsplash.com/photo-1610446750983-730b9107a826?q=80&w=2070&auto=format&fit=crop" },
-    { name: "Kosha Mangsho", description: "Slow-cooked mutton in a rich, spicy, and dark gravy.", image: "https://images.unsplash.com/photo-1606791422814-b32c70526e27?q=80&w=1974&auto=format&fit=crop" },
-    { name: "Luchi Alur Dom", description: "Fluffy deep-fried bread with a spicy, flavorful potato curry.", image: "https://images.unsplash.com/photo-1604329226859-5a73e874b8c2?q=80&w=2070&auto=format&fit=crop" },
-    { name: "Chingri Malai Curry", description: "A creamy and mild prawn curry made with coconut milk.", image: "https://images.unsplash.com/photo-1626502128209-59799513813a?q=80&w=1974&auto=format&fit=crop" },
-    { name: "Rasgulla", description: "Spongy cottage cheese balls soaked in a light sugar syrup.", image: "https://images.unsplash.com/photo-1568801556943-4403993c187f?q=80&w=1974&auto=format&fit=crop" }
+    { name: "Shorshe Ilish", description: "Hilsa fish steamed in a pungent mustard-poppy seed gravy.", image: "https://images.pexels.com/photos/12737656/pexels-photo-12737656.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Kolkata Biryani", description: "Aromatic long-grain rice, tender meat, and a signature potato.", image: "https://images.pexels.com/photos/7437399/pexels-photo-7437399.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Daab Chingri", description: "Prawns in a creamy coconut curry, served inside a green coconut.", image: "https://images.pexels.com/photos/699953/pexels-photo-699953.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Mishti Doi", description: "Sweet, caramelized yogurt, set in traditional earthenware pots.", image: "https://images.pexels.com/photos/16307841/pexels-photo-16307841.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Kosha Mangsho", description: "Slow-cooked mutton in a rich, spicy, and dark gravy.", image: "https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Luchi Alur Dom", description: "Fluffy deep-fried bread with a spicy, flavorful potato curry.", image: "https://images.pexels.com/photos/4449068/pexels-photo-4449068.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Chingri Malai Curry", description: "A creamy and mild prawn curry made with coconut milk.", image: "https://images.pexels.com/photos/5410422/pexels-photo-5410422.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+    { name: "Rasgulla", description: "Spongy cottage cheese balls soaked in a light sugar syrup.", image: "https://images.pexels.com/photos/6149937/pexels-photo-6149937.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" }
+];
+const heroImages: string[] = [
+    photo1, // Traditional Bengali thali with steamed rice, fish curry, dal, and sides
+    photo2, // Modern coastal restaurant interior
+    photo3, // Bengali prawns curry
+    photo4, // Rustic-modern fusion dining space
+    photo5 // Goa beach sunset with palm trees
 ];
 
 const HomePage = () => {
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { staggerChildren: 0.3, delayChildren: 0.2 } }
-    };
-    const navigate = useNavigate()
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
-    };
 
-    const [carouselIndex, setCarouselIndex] = useState<number>(0);
-    const [itemsPerPage, setItemsPerPage] = useState<number>(4);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
-        const updateItemsPerPage = () => {
-            if (window.innerWidth < 768) setItemsPerPage(1);
-            else if (window.innerWidth < 1024) setItemsPerPage(2);
-            else setItemsPerPage(4);
+        const timer = setTimeout(() => {
+            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+        }, 5000); // Change image every 5 seconds
+        return () => clearTimeout(timer);
+    }, [currentImageIndex]);
+
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                type: "tween",
+                staggerChildren: 0.3,
+                delayChildren: 0.2
+            }
+        }
+    };
+    const navigate = useNavigate()
+    const itemVariants: Variants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                type: "tween",
+                duration: 0.8,
+                ease: [0.25, 0.1, 0.25, 1.0]
+            }
+        }
+    };
+
+    const [emblaRef, emblaApi] = useEmblaCarousel({
+        align: 'start',
+        slidesToScroll: 1,
+        breakpoints: {
+            '(min-width: 768px)': { slidesToScroll: 2 },
+            '(min-width: 1024px)': { slidesToScroll: 4 }
+        }
+    });
+
+    const [canScrollPrev, setCanScrollPrev] = useState(false);
+    const [canScrollNext, setCanScrollNext] = useState(false);
+
+    const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+    const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setCanScrollPrev(emblaApi.canScrollPrev());
+        setCanScrollNext(emblaApi.canScrollNext());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        onSelect();
+        emblaApi.on('select', onSelect);
+        emblaApi.on('reInit', onSelect);
+        return () => {
+            emblaApi.off('select', onSelect);
+            emblaApi.off('reInit', onSelect);
         };
-        updateItemsPerPage();
-        window.addEventListener('resize', updateItemsPerPage);
-        return () => window.removeEventListener('resize', updateItemsPerPage);
-    }, []);
-
-    const totalPages: number = Math.ceil(menuHighlights.length / itemsPerPage);
-    const pages: MenuHighlight[][] = Array.from({ length: totalPages }, (_, i) =>
-        menuHighlights.slice(i * itemsPerPage, i * itemsPerPage + itemsPerPage)
-    );
-
-    const nextSlide = () => setCarouselIndex((prev) => (prev + 1) % totalPages);
-    const prevSlide = () => setCarouselIndex((prev) => (prev - 1 + totalPages) % totalPages);
+    }, [emblaApi, onSelect]);
 
     return (
         <>
             {/* Hero Section */}
-            <section className="relative h-screen w-full flex items-center justify-center text-center text-white overflow-hidden">
+            <section className="relative h-screen w-full flex items-center justify-center text-center text-white overflow-hidden bg-slate-900">
+                <AnimatePresence>
+                    <motion.img
+                        key={currentImageIndex}
+                        src={heroImages[currentImageIndex]}
+                        initial={{ opacity: 0, scale: 1.05 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.5 }}
+                        className="absolute z-0 w-full h-full object-cover"
+                        alt="Deuri Restaurant Ambiance"
+                    />
+                </AnimatePresence>
                 <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
-                <video autoPlay loop muted playsInline className="absolute z-0 w-auto min-w-full min-h-full max-w-none">
-                    <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-sea-seen-from-the-beach-22123-large.mp4" type="video/mp4" />
-                </video>
                 <motion.div className="relative z-20 px-4" variants={containerVariants} initial="hidden" animate="visible">
                     <motion.h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold" style={{ fontFamily: "'Playfair Display', serif", textShadow: '2px 2px 10px rgba(0,0,0,0.7)' }} variants={itemVariants}>
                         The Soul of Bengal
@@ -81,6 +139,11 @@ const HomePage = () => {
                         </button>
                     </motion.div>
                 </motion.div>
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-3">
+                    {heroImages.map((_, index) => (
+                        <button key={index} onClick={() => setCurrentImageIndex(index)} className={`w-3 h-3 rounded-full transition-colors ${currentImageIndex === index ? 'bg-amber-500' : 'bg-white/50'}`}></button>
+                    ))}
+                </div>
             </section>
 
             {/* Our Story Section */}
@@ -117,17 +180,17 @@ const HomePage = () => {
                         <p className="text-lg text-amber-300 mb-16 max-w-3xl mx-auto">More than a meal, it's a journey of flavors where tradition meets innovation.</p>
                     </AnimatedSection>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-                        {(
-                            [
-                                { icon: <Star />, title: "Authentic Flavors", desc: "Timeless recipes passed down through generations." },
-                                { icon: <Droplet />, title: "Goan Fusion Twist", desc: "Classic Bengali dishes reimagined with a coastal vibe." },
-                                { icon: <Leaf />, title: "Fresh Ingredients", desc: "Locally sourced produce and the freshest catch of the day." },
-                                { icon: <Feather />, title: "Modern Ambiance", desc: "Elegant and comfortable dining for a memorable experience." }
-                            ] as ExperienceItem[]
-                        ).map((item: ExperienceItem) => (
+                        {[
+                            { icon: Star, title: "Authentic Flavors", desc: "Timeless recipes passed down through generations." },
+                            { icon: Droplet, title: "Goan Fusion Twist", desc: "Classic Bengali dishes reimagined with a coastal vibe." },
+                            { icon: Leaf, title: "Fresh Ingredients", desc: "Locally sourced produce and the freshest catch of the day." },
+                            { icon: Feather, title: "Modern Ambiance", desc: "Elegant and comfortable dining for a memorable experience." }
+                        ].map((item: ExperienceItem) => (
                             <AnimatedSection key={item.title} delay={0.15 * Math.random()}>
                                 <div className="bg-slate-900 p-8 rounded-lg shadow-lg h-full">
-                                    <div className="text-amber-400 mb-4 mx-auto w-fit p-3 bg-slate-800 rounded-full">{cloneElement(item.icon, { size: 32 })}</div>
+                                    <div className="text-amber-400 mb-4 mx-auto w-fit p-3 bg-slate-800 rounded-full">
+                                        <item.icon size={32} />
+                                    </div>
                                     <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
                                     <p className="text-slate-400">{item.desc}</p>
                                 </div>
@@ -145,35 +208,43 @@ const HomePage = () => {
                         <p className="text-lg text-amber-300 mb-12 max-w-3xl mx-auto">From the rivers of Padma to the streets of Kolkata, our menu is a curated collection of Bengal's most cherished dishes.</p>
                     </AnimatedSection>
                     <div className="relative">
-                        <div className="overflow-hidden">
-                            <AnimatePresence initial={false}>
-                                <motion.div
-                                    key={carouselIndex}
-                                    className="flex"
-                                    initial={{ x: "100%" }}
-                                    animate={{ x: 0 }}
-                                    exit={{ x: "-100%" }}
-                                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                >
-                                    {pages.length > 0 && pages[carouselIndex].map((item: MenuHighlight) => (
-                                        <div key={item.name} className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-4">
-                                            <div className="bg-slate-800 rounded-lg overflow-hidden group transform hover:-translate-y-2 transition-transform duration-300 shadow-lg h-full flex flex-col">
-                                                <div className="h-56 overflow-hidden"><img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /></div>
-                                                <div className="p-6 flex-grow flex flex-col"><h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</h3><p className="text-slate-400 flex-grow">{item.description}</p></div>
+                        <div className="overflow-hidden" ref={emblaRef}>
+                            <div className="flex">
+                                {menuHighlights.map((item: MenuHighlight) => (
+                                    <div key={item.name} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_25%] p-4">
+                                        <div className="bg-slate-800 rounded-lg overflow-hidden group transform hover:-translate-y-2 transition-transform duration-300 shadow-lg h-full flex flex-col">
+                                            <div className="h-56 overflow-hidden">
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.name} 
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                                />
+                                            </div>
+                                            <div className="p-6 flex-grow flex flex-col">
+                                                <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                                                    {item.name}
+                                                </h3>
+                                                <p className="text-slate-400 flex-grow">{item.description}</p>
                                             </div>
                                         </div>
-                                    ))}
-                                </motion.div>
-                            </AnimatePresence>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        {totalPages > 1 && <>
-                            <button onClick={prevSlide} className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-4 bg-amber-500 text-slate-900 p-3 rounded-full shadow-lg hover:bg-amber-400 transition-colors z-10 border-none">
-                                <ArrowLeft size={24} />
-                            </button>
-                            <button onClick={nextSlide} className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-4 bg-amber-500 text-slate-900 p-3 rounded-full shadow-lg hover:bg-amber-400 transition-colors z-10 border-none">
-                                <ArrowRight size={24} />
-                            </button>
-                        </>}
+                        <button 
+                            onClick={scrollPrev} 
+                            className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-4 bg-amber-500 text-slate-900 p-3 rounded-full shadow-lg hover:bg-amber-400 transition-colors z-10 border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={!canScrollPrev}
+                        >
+                            <ArrowLeft size={24} />
+                        </button>
+                        <button 
+                            onClick={scrollNext} 
+                            className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-4 bg-amber-500 text-slate-900 p-3 rounded-full shadow-lg hover:bg-amber-400 transition-colors z-10 border-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={!canScrollNext}
+                        >
+                            <ArrowRight size={24} />
+                        </button>
                     </div>
                 </div>
             </section>

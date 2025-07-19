@@ -16,7 +16,7 @@ const ContactPage = () => (
                         <form className="space-y-6">
                             <input type="text" placeholder="Your Name" className="w-full bg-slate-700 border-2 border-slate-600 rounded-md p-3 focus:outline-none focus:border-amber-400 transition-colors" />
                             <input type="email" placeholder="Your Email" className="w-full bg-slate-700 border-2 border-slate-600 rounded-md p-3 focus:outline-none focus:border-amber-400 transition-colors" />
-                            <textarea placeholder="Your Message" rows="5" className="w-full bg-slate-700 border-2 border-slate-600 rounded-md p-3 focus:outline-none focus:border-amber-400 transition-colors"></textarea>
+                            <textarea placeholder="Your Message" rows={5} className="w-full bg-slate-700 border-2 border-slate-600 rounded-md p-3 focus:outline-none focus:border-amber-400 transition-colors"></textarea>
                             <button type="submit" className="w-full flex items-center justify-center bg-amber-500 text-slate-900 font-bold py-3 px-6 rounded-md hover:bg-amber-400 transition-all duration-300 transform hover:scale-105 border-none">
                                 Send Message <Send className="ml-2" size={20} />
                             </button>
