@@ -47,7 +47,7 @@ const HomePage = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-        }, 5000); // Change image every 5 seconds
+        }, 2500); // Change image every 5 seconds
         return () => clearTimeout(timer);
     }, [currentImageIndex]);
 
