@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { signIn } from '@/lib/auth';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '@/store/redux/slices/authSlice';
+import logo from '@/assets/images/logo.jpg'; // Adjust the path as necessary
 
 function AdminLoginPage() {
     const navigate = useNavigate();
@@ -44,7 +45,7 @@ function AdminLoginPage() {
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <img
                     className="mx-auto h-12 w-auto"
-                    src="/src/assets/images/logo.jpg"
+                    src={logo}
                     alt="Restaurant Logo"
                 />
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
