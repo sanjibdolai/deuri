@@ -48,7 +48,7 @@ function BookingListPage() {
                 <TableCell>{booking.guests}</TableCell>
                 <TableCell>{booking.tableNo}</TableCell>
                 <TableCell>
-                  <Badge variant={booking.status === 'confirmed' ? 'success' : 'destructive'}>
+                  <Badge variant={booking.status === 'confirmed' ? 'outline' : 'destructive'}>
                     {booking.status}
                   </Badge>
                 </TableCell>
