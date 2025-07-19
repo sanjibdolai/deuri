@@ -5,7 +5,7 @@ import { reducers } from "./redux";
 const persistConfig = {
   key: "deuri",
   storage,
-  whitelist: ["theme"],
+  whitelist: ["theme", "auth"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

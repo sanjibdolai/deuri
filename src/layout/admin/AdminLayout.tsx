@@ -11,10 +11,13 @@ import { NavUser } from "@/components/NavUser";
 import { useSelector } from "react-redux";
 import { selectTheme } from "@/store/redux/slices/themeSlice";
 import { useEffect } from "react";
+import { useAuthState } from "@/hooks/useAuthState";
 
 function AdminLayout() {
-
     const theme = useSelector(selectTheme);
+    
+    // Initialize authentication state management
+    useAuthState();
 
     // Effect for managing the color theme (no changes needed here).
     useEffect(() => {

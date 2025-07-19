@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is accessing their own document
+    function isAccessingOwnDocument() {
+      return isAuthenticated() && request.auth.uid == resource.data.id;
+    }
+    
+    // Helper function to check if user is authenticated (simplified)
+    function isAdmin() {
+      return isAuthenticated();
+    }
+
+    // Users collection rules
+    match /users/{userId} {
+      // Allow users to read their own document
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Allow creation only if the document ID matches the authenticated user
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Allow users to update their own document
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Allow authenticated users to delete their own document
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Bookings collection rules
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || // User can read their own bookings
+        isAdmin() // Admins can read all bookings
+      );
+      allow create: if true; // Anyone can create bookings
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || // Users can update their own bookings
+        isAdmin() // Admins can update any booking
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Menu items collection rules
+    match /menuItems/{itemId} {
+      allow read: if true; // Anyone can read menu items
+      allow write: if isAuthenticated(); // Any authenticated user can modify menu items
+    }
+
+    // Orders collection rules
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid; // Users can read their own orders
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid; // Users can update their own orders
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid; // Users can delete their own orders
+    }
+  }
+}

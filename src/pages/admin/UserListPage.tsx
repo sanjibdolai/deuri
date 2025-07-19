@@ -38,7 +38,6 @@ function UserListPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
               <TableHead>Last Visit</TableHead>
               <TableHead>Total Bookings</TableHead>
               <TableHead>Actions</TableHead>
@@ -49,7 +48,6 @@ function UserListPage() {
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
                 <TableCell>{user.lastVisit}</TableCell>
                 <TableCell>{user.totalBookings}</TableCell>
                 <TableCell>
